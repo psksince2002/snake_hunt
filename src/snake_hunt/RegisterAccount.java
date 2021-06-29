@@ -18,6 +18,17 @@ public class RegisterAccount {
 	public static void main(String[] args) throws ClassNotFoundException, NoSuchAlgorithmException, SQLException {
 		registerAccount();
 	}
+	
+	public static boolean isValidISOCountry(String s) {
+        for(String iso:Locale.getISOCountries()) {
+       	 Locale l = new Locale("", iso);
+            if(l.getDisplayCountry().equalsIgnoreCase(s)==true) {
+           	 return true;
+            }
+        }
+        return false;
+   }
+	
 	private static final Set<String> ISO_COUNTRIES = new HashSet<String>
     (Arrays.asList(Locale.getISOCountries()));
 	
@@ -40,6 +51,8 @@ public class RegisterAccount {
 				 username=sc.next();
 			}
 		}
+		
+		//Getting password from the user
 		String hashedPassword;
 		while(true) {
 			System.out.println("enter password :");
@@ -53,6 +66,8 @@ public class RegisterAccount {
 			}
 			
 		}
+		
+		//Getting Country name form the user
 		String countryName;
 		while(true) {
 			System.out.println("enter the name of your country");
@@ -64,20 +79,13 @@ public class RegisterAccount {
 				System.out.println("not a valid country name");
 			}
 		}
+		
 		long highscore=0;
 		Statement st=con.createStatement();
 		String sqlcreaterow="INSERT INTO user VALUES ('" + username  + "','" + hashedPassword + "','"+ highscore + "','" + countryName + "')";
 		st.executeUpdate(sqlcreaterow);
 		System.out.println("Account has been created");
 	}
-	public static boolean isValidISOCountry(String s) {
-         for(String iso:Locale.getISOCountries()) {
-        	 Locale l = new Locale("", iso);
-             if(l.getDisplayCountry().equalsIgnoreCase(s)==true) {
-            	 return true;
-             }
-         }
-         return false;
-    }
+	
 
 }
