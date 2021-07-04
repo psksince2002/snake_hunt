@@ -85,6 +85,7 @@ public class RegisterAccount {
 		String sqlcreaterow="INSERT INTO user VALUES ('" + username  + "','" + hashedPassword + "','"+ highscore + "','" + countryName + "')";
 		st.executeUpdate(sqlcreaterow);
 		System.out.println("Account has been created");
+		
 	}
 	
 

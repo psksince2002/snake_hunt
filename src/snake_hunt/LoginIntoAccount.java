@@ -10,17 +10,26 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 public class LoginIntoAccount {
-
+	static String res;
 	public static void main(String[] args) throws ClassNotFoundException, NoSuchAlgorithmException, SQLException{
-		System.out.println(loginIntoAccount());
+		
+		res=loginIntoAccount();
+		if(res!=null) {
+			new GameFrame();
+		}
 	}
 	
-	public static boolean loginIntoAccount() throws ClassNotFoundException, SQLException, NoSuchAlgorithmException{
+	LoginIntoAccount(){
+		
+	}
+	
+	public static String loginIntoAccount() throws ClassNotFoundException, SQLException, NoSuchAlgorithmException{
 		Class.forName("com.mysql.jdbc.Driver");
 		Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/snake","root","root");
         Scanner sc=new Scanner(System.in);
         int attempts=0;
         PreparedStatement ps=con.prepareStatement("select username,password from user where username=?");
+        
         while(true) {
         	if(attempts==5) {
         		break;
@@ -31,6 +40,7 @@ public class LoginIntoAccount {
             String password=sc.next();
             ps.setString(1, username);
             ResultSet rs=ps.executeQuery();
+            
             if(rs.next()) {
             	String passwordfromDB=rs.getString("password");
             	String HashedPasswordFromUser=HashPassword.hashPassword(password);
@@ -38,7 +48,8 @@ public class LoginIntoAccount {
             	byte[] passwordfromDBBytes=passwordfromDB.getBytes();
             	MessageDigest messageDigest 	= MessageDigest.getInstance("MD5");
             	if(messageDigest.isEqual(HashedPasswordFromUserBytes, passwordfromDBBytes)) {
-            	     return true;	
+            	     return username;
+            	  
             	}
             	else {
             		attempts=attempts+1;
@@ -53,10 +64,10 @@ public class LoginIntoAccount {
             
             
         }
-        
-        System.out.println("All attempts are done try after some time");   
-        return false;
+	    System.out.println("All attempts are done try after some time");   
+		return null;
 		
 	}
+
 
 }
