@@ -19,10 +19,6 @@ public class LoginIntoAccount {
 		}
 	}
 	
-	LoginIntoAccount(){
-		
-	}
-	
 	public static String loginIntoAccount() throws ClassNotFoundException, SQLException, NoSuchAlgorithmException{
 		Class.forName("com.mysql.jdbc.Driver");
 		Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/snake","root","root");

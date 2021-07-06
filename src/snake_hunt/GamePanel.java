@@ -12,7 +12,7 @@ import java.sql.Statement;
 
 import javax.swing.*;
 import java.util.Random;
-import java.util.Scanner;
+
 
 import javax.swing.JPanel;
 
@@ -23,6 +23,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	static final int UNIT_SIZE=25;
 	static final int GAME_UNITS = (SCREEN_WIDTH*SCREEN_HEIGHT)/UNIT_SIZE;
 	static  int DELAY=150;
+	static boolean play = true;
 	final int x[]=new int[GAME_UNITS];
 	final int y[]=new int[GAME_UNITS];
 	int bodyParts = 6;
@@ -31,6 +32,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	int appleY;
 	char direction = 'R';
 	boolean running = false;
+	boolean welcome = true;
 	Timer timer;
 	Random random;
 	
@@ -41,7 +43,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		this.setBackground(Color.black);
 		this.setFocusable(true);
 		this.addKeyListener(new MyKeyAdapter());
-		startGame();
+		//startGame();
 	}
 		
 
@@ -51,6 +53,15 @@ public class GamePanel extends JPanel implements ActionListener {
 		timer = new Timer(DELAY,this);
 		timer.start();
 	}
+	
+	public void welcomePage(Graphics g) {
+		g.setColor(Color.red);
+		g.setFont(new Font("INK Free",Font.BOLD,75));
+		FontMetrics metrics2 = getFontMetrics(g.getFont());
+		g.drawString("WELCOME!", (SCREEN_WIDTH - metrics2.stringWidth("WELCOME!"))/2, SCREEN_HEIGHT/2);
+		
+	}
+	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		try {
@@ -70,7 +81,8 @@ public class GamePanel extends JPanel implements ActionListener {
 		
 	}
 	public void draw(Graphics g) throws ClassNotFoundException, SQLException, NoSuchAlgorithmException {
-		if(running) {
+		if(welcome) welcomePage(g);
+		else if(running) {
 			for(int i=0;i<SCREEN_HEIGHT/UNIT_SIZE;i++)
 			{
 				g.drawLine(i*UNIT_SIZE, 0, i*UNIT_SIZE, SCREEN_HEIGHT);
@@ -129,7 +141,7 @@ public class GamePanel extends JPanel implements ActionListener {
 			newApple();
 			int c=1;
 			if(applesEaten>7*c) {
-				DELAY=DELAY-30;
+				DELAY=DELAY-10;
 				timer = new Timer(DELAY,this);
 				timer.start();
 				c=c+1;
@@ -191,11 +203,21 @@ public class GamePanel extends JPanel implements ActionListener {
 		
 		System.out.println(bal);
 		if(applesEaten>bal) {
-			int re = st.executeUpdate("update user set high_score = high_score +'"+applesEaten+"' where username='"+us+"'");
+			int re = st.executeUpdate("update user set high_score ='"+applesEaten+"' where username='"+us+"'");
 			System.out.println(re);
 		}
 		
 		
+	}
+	
+	public void resume() {
+		play = true;
+		timer.start();
+	}
+	
+	public void pause() {
+		play = false;
+		timer.stop();
 	}
 	
 	@Override
@@ -231,6 +253,18 @@ public class GamePanel extends JPanel implements ActionListener {
 			case KeyEvent.VK_DOWN:
 				if(direction !='U') {
 					direction = 'D';
+				}
+			case KeyEvent.VK_SPACE:
+				if(play) pause();
+				else resume();
+				break;
+			case KeyEvent.VK_ESCAPE:
+				System.exit(0);
+				break;
+			case KeyEvent.VK_ENTER:
+				if(welcome) {
+				welcome = false;
+				startGame();
 				}
 				break;
 			}
