@@ -18,11 +18,11 @@ import javax.swing.JPanel;
 
 public class GamePanel extends JPanel implements ActionListener {
 	
-	static final int SCREEN_WIDTH = 600;
-	static final int SCREEN_HEIGHT = 600;
+	static final int SCREEN_WIDTH = 650;
+	static final int SCREEN_HEIGHT = 650;
 	static final int UNIT_SIZE=25;
 	static final int GAME_UNITS = (SCREEN_WIDTH*SCREEN_HEIGHT)/UNIT_SIZE;
-	static  int DELAY=150;
+	static  int DELAY=100;
 	static boolean play = true;
 	final int x[]=new int[GAME_UNITS];
 	final int y[]=new int[GAME_UNITS];
@@ -52,14 +52,6 @@ public class GamePanel extends JPanel implements ActionListener {
 		running=true;
 		timer = new Timer(DELAY,this);
 		timer.start();
-	}
-	
-	public void welcomePage(Graphics g) {
-		g.setColor(Color.red);
-		g.setFont(new Font("INK Free",Font.BOLD,75));
-		FontMetrics metrics2 = getFontMetrics(g.getFont());
-		g.drawString("WELCOME!", (SCREEN_WIDTH - metrics2.stringWidth("WELCOME!"))/2, SCREEN_HEIGHT/2);
-		
 	}
 	
 	public void paintComponent(Graphics g) {
@@ -138,15 +130,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		if(x[0]==appleX && y[0]==appleY) {
 			bodyParts++;
 			applesEaten++;
-			newApple();
-			int c=1;
-			if(applesEaten>7*c) {
-				DELAY=DELAY-10;
-				timer = new Timer(DELAY,this);
-				timer.start();
-				c=c+1;
-			}
-			
+			newApple();			
 		}
 	}
 	public void checkCollisions() {
@@ -175,6 +159,27 @@ public class GamePanel extends JPanel implements ActionListener {
 		}
 	}
 	
+	public void welcomePage(Graphics g) {
+		//SNAKE HUNT
+		g.setColor(Color.red);
+		g.setFont(new Font("INK Free",Font.BOLD,75));
+		FontMetrics metrics1 = getFontMetrics(g.getFont());
+		g.drawString("SNAKE HUNT", (SCREEN_WIDTH - metrics1.stringWidth("SNAKE HUNT"))/2, SCREEN_HEIGHT/2);
+		
+		//ENTER TO START
+		g.setColor(Color.cyan);
+		g.setFont(new Font("INK Free",Font.BOLD,20));
+		FontMetrics metrics2 = getFontMetrics(g.getFont());
+		g.drawString("Press 'ENTER' to hunt!", (SCREEN_WIDTH - metrics2.stringWidth("Press 'ENTER' to hunt!"))/2, SCREEN_HEIGHT - 100);
+		
+		//Use arrow keys
+		g.setColor(Color.GRAY);
+		g.setFont(new Font("INK Free",Font.ITALIC,20));
+		FontMetrics metrics3 = getFontMetrics(g.getFont());
+		g.drawString("(Use Arrow keys to move.)", (SCREEN_WIDTH - metrics3.stringWidth("(Use Arrow keys to move.)"))/2, SCREEN_HEIGHT - 50);
+		
+	}
+	
 	public void gameOver(Graphics g) throws SQLException, ClassNotFoundException, NoSuchAlgorithmException {
 		//score
 		g.setColor(Color.red);
@@ -191,9 +196,9 @@ public class GamePanel extends JPanel implements ActionListener {
 		Class.forName("com.mysql.jdbc.Driver");
 		Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/snake","root","root");
 		Statement st = con.createStatement();
-		LoginIntoAccount s = new LoginIntoAccount();
-	    String us = s.res;
-	    PreparedStatement ps=con.prepareStatement("select high_score from user where username=?");
+		SnakeGame s = new SnakeGame();
+	    String us = s.playername;
+	    PreparedStatement ps=con.prepareStatement("select high_score from userinfo where username=?");
 	    ps.setString(1, us);
 		ResultSet rs=ps.executeQuery();
 		int bal = 0;
@@ -203,7 +208,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		
 		System.out.println(bal);
 		if(applesEaten>bal) {
-			int re = st.executeUpdate("update user set high_score ='"+applesEaten+"' where username='"+us+"'");
+			int re = st.executeUpdate("update userinfo set high_score ='"+applesEaten+"' where username='"+us+"'");
 			System.out.println(re);
 		}
 		
@@ -254,6 +259,7 @@ public class GamePanel extends JPanel implements ActionListener {
 				if(direction !='U') {
 					direction = 'D';
 				}
+				break;
 			case KeyEvent.VK_SPACE:
 				if(play) pause();
 				else resume();
