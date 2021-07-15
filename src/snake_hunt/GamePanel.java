@@ -75,11 +75,7 @@ public class GamePanel extends JPanel implements ActionListener {
 	public void draw(Graphics g) throws ClassNotFoundException, SQLException, NoSuchAlgorithmException {
 		if(welcome) welcomePage(g);
 		else if(running) {
-			for(int i=0;i<SCREEN_HEIGHT/UNIT_SIZE;i++)
-			{
-				g.drawLine(i*UNIT_SIZE, 0, i*UNIT_SIZE, SCREEN_HEIGHT);
-				g.drawLine(0, i*UNIT_SIZE, SCREEN_WIDTH,i*UNIT_SIZE);
-			}
+			
 			g.setColor(Color.red);
 			g.fillOval(appleX, appleY, UNIT_SIZE, UNIT_SIZE);
 			for(int i=0;i<bodyParts;i++) {
@@ -166,11 +162,29 @@ public class GamePanel extends JPanel implements ActionListener {
 		FontMetrics metrics1 = getFontMetrics(g.getFont());
 		g.drawString("SNAKE HUNT", (SCREEN_WIDTH - metrics1.stringWidth("SNAKE HUNT"))/2, SCREEN_HEIGHT/2);
 		
-		//ENTER TO START
+		//Difficulty level
 		g.setColor(Color.cyan);
-		g.setFont(new Font("INK Free",Font.BOLD,20));
+		g.setFont(new Font("INK Free",Font.BOLD,30));
 		FontMetrics metrics2 = getFontMetrics(g.getFont());
-		g.drawString("Press 'ENTER' to hunt!", (SCREEN_WIDTH - metrics2.stringWidth("Press 'ENTER' to hunt!"))/2, SCREEN_HEIGHT - 100);
+		g.drawString("Select a difficulty level", (SCREEN_WIDTH - metrics2.stringWidth("Select a difficulty level"))/2, 350);
+		
+		//easy
+		g.setColor(Color.green);
+		g.setFont(new Font("INK Free",Font.BOLD,25));
+		FontMetrics metricsd1 = getFontMetrics(g.getFont());
+		g.drawString("Easy (Press '1')", (SCREEN_WIDTH - metricsd1.stringWidth("Easy (Press '1')"))/2, 400);
+		//medium
+		g.setColor(Color.yellow);
+		g.setFont(new Font("INK Free",Font.BOLD,25));
+		FontMetrics metricsd2 = getFontMetrics(g.getFont());
+		g.drawString("Medium (Press '2')", (SCREEN_WIDTH - metricsd2.stringWidth("Medium (Press '2')"))/2, 450);
+		//hard
+		g.setColor(new Color(255,140,0));
+		g.setFont(new Font("INK Free",Font.BOLD,25));
+		FontMetrics metricsd3 = getFontMetrics(g.getFont());
+		g.drawString("Hard (Press '3')", (SCREEN_WIDTH - metricsd3.stringWidth("Hard (Press '3')"))/2, 500);
+				
+		
 		
 		//Use arrow keys
 		g.setColor(Color.GRAY);
@@ -181,11 +195,19 @@ public class GamePanel extends JPanel implements ActionListener {
 	}
 	
 	public void gameOver(Graphics g) throws SQLException, ClassNotFoundException, NoSuchAlgorithmException {
+		
+		Class.forName("com.mysql.jdbc.Driver");
+		Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/snake","root","root");
+		Statement st = con.createStatement();
+		SnakeGame s = new SnakeGame();
+	    String us = s.playername;
+	    
 		//score
 		g.setColor(Color.red);
 		g.setFont(new Font("INK Free",Font.BOLD,50));
 		FontMetrics metrics1 = getFontMetrics(g.getFont());
 		g.drawString("Score: "+applesEaten, (SCREEN_WIDTH - metrics1.stringWidth("Score: "+ applesEaten))/2,g.getFont().getSize());
+		
 		//game over
 		g.setColor(Color.red);
 		g.setFont(new Font("INK Free",Font.BOLD,75));
@@ -193,11 +215,6 @@ public class GamePanel extends JPanel implements ActionListener {
 		g.drawString("Game Over", (SCREEN_WIDTH - metrics.stringWidth("GameOver"))/2, SCREEN_HEIGHT/2);
 		
 		
-		Class.forName("com.mysql.jdbc.Driver");
-		Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/snake","root","root");
-		Statement st = con.createStatement();
-		SnakeGame s = new SnakeGame();
-	    String us = s.playername;
 	    PreparedStatement ps=con.prepareStatement("select high_score from userinfo where username=?");
 	    ps.setString(1, us);
 		ResultSet rs=ps.executeQuery();
@@ -211,6 +228,26 @@ public class GamePanel extends JPanel implements ActionListener {
 			int re = st.executeUpdate("update userinfo set high_score ='"+applesEaten+"' where username='"+us+"'");
 			System.out.println(re);
 		}
+		
+	    PreparedStatement ps1=con.prepareStatement("select high_score from userinfo where username=?");
+	    ps1.setString(1, us);
+		ResultSet rs1=ps1.executeQuery();
+		int bal1 = 0;
+		while(rs1.next()){
+			bal1 = rs1.getInt(1);
+		}
+		
+		//Your High Score is
+		g.setColor(Color.red);
+		g.setFont(new Font("INK Free",Font.BOLD,30));
+		FontMetrics metrics2 = getFontMetrics(g.getFont());
+		g.drawString("Your High Score is : "+bal1, (SCREEN_WIDTH - metrics2.stringWidth("Your High Score is : "+ bal1))/2,SCREEN_HEIGHT - 40);
+		
+		//ESC TO EXIT
+		g.setColor(Color.GRAY);
+		g.setFont(new Font("INK Free",Font.ITALIC,20));
+		FontMetrics metrics3 = getFontMetrics(g.getFont());
+		g.drawString("Press 'ESC' to exit.", (SCREEN_WIDTH - metrics3.stringWidth("Press 'ESC' to exit."))/2, SCREEN_HEIGHT - 5);
 		
 		
 	}
@@ -264,14 +301,29 @@ public class GamePanel extends JPanel implements ActionListener {
 				if(play) pause();
 				else resume();
 				break;
+			case KeyEvent.VK_1:
+				if(welcome) {
+					DELAY = 100;
+					welcome = false;
+					startGame();
+				}
+				break;
+			case KeyEvent.VK_2:
+				if(welcome) {
+					DELAY = 75;
+					welcome = false;
+					startGame();
+				}
+				break;
+			case KeyEvent.VK_3:
+				if(welcome) {
+					DELAY = 60;
+					welcome = false;
+					startGame();
+				}
+				break;
 			case KeyEvent.VK_ESCAPE:
 				System.exit(0);
-				break;
-			case KeyEvent.VK_ENTER:
-				if(welcome) {
-				welcome = false;
-				startGame();
-				}
 				break;
 			}
 		}

@@ -20,7 +20,6 @@ public class GameFrame extends JFrame{
         ResultSet rs=ps.executeQuery();
         int high_score=0;
         if(rs.next()==false) {
-        	System.out.println("HII");
         	PreparedStatement ps1=con.prepareStatement("INSERT INTO userinfo VALUES (?,?)");
     		ps1.setString(1,us);
     		ps1.setInt(2,high_score);
